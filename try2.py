@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
-import nltk
-from nltk.corpus import stopwords
 # GUI
 import tkinter
+from tkinter import FLAT
+
+import nltk
+from nltk.corpus import stopwords
 
 
 class LanguageModel:
@@ -12,7 +14,6 @@ class LanguageModel:
         # فيها الباحثون ثمرات :عدد مرات انها جت بالشكل ده
         self.TrigramsDic = {}  # key :value
         self.probabilitiesDic = {}
-        self.numPredictions = 5
 
     def ReadData(self, dir):
         datasetTxt = ""
@@ -45,22 +46,22 @@ class LanguageModel:
     # make list of sentence of 3 words from tokens  and calculate probability
     def generate3Grams(self, words_list):
         for num in range(0, len(words_list)):
-            sentence = ' '.join(words_list[num:num +3])
+            sentence = ' '.join(words_list[num:num + 3])
             self.calcProb(sentence)
 
     def PredictNext(self, inputsentence):
-        outputSequence = []
+        FoundedSequence = []
         options = []
         predicted = []
-        nPred = 5
         inputSequence = inputsentence.split(" ")
         # search in dictionary
         for sentence in self.probabilitiesDic.keys():
             if inputsentence in sentence:
-                outputSequence = sentence.split(" ")
+                FoundedSequence = sentence.split(" ")
+                # print(outputSequence)
                 cont = False
                 for i in range(0, len(inputSequence)):
-                    if outputSequence[i] != inputSequence[i]:
+                    if FoundedSequence[i] != inputSequence[i]:
                         cont = True
                         break
                 if cont:
@@ -70,26 +71,26 @@ class LanguageModel:
         if (len(predicted) == 0):
             return []
         else:
-            options.append(outputSequence[len(inputSequence)])
+            options.append(FoundedSequence[len(inputSequence)])
         return options
 
 
 top = tkinter.Tk()
-top.title("Arabic Auto fill")
-canvas1 = tkinter.Canvas(top, width=400, height=300)
-canvas1.pack()
-label1 = tkinter.Label(top, text='Enter your phrase')
-label1.config(font=('helvetica', 18))
-canvas1.create_window(200, 25, window=label1)
-entry1 = tkinter.Entry(top,width=50)
 
+top.title("Arabic Auto fill")
+canvas1 = tkinter.Canvas(top, width=400, height=300,background='#EFFFFD')
+canvas1.pack()
+label1 = tkinter.Label(top, text='Enter your phrase',background='#EFFFFD')
+label1.config(font=('helvetica', 16))
+canvas1.create_window(200, 25, window=label1)
+entry1 = tkinter.Entry(top, width=20,font=('Arial 14'),borderwidth=2)
 
 
 def getNextword():
     seq = entry1.get()
     words1 = seq.split(" ")
     # print(len(words1))
-    if len(words1) == 2:
+    if len(words1) <= 2:
         Lm = LanguageModel()
         dataset = Lm.ReadData('Khaleej-2004/Economy')
         words = Lm.Tokenization(dataset)
@@ -97,20 +98,22 @@ def getNextword():
         nxtwords = Lm.PredictNext(seq)
         # print(nxtwords)
     else:
-        seq2 = words1[len(words1) - 2] +" "+ words1[len(words1) - 1]
+        seq2 = words1[len(words1) - 2] + " " + words1[len(words1) - 1]
         Lm = LanguageModel()
         dataset = Lm.ReadData('Khaleej-2004/Economy')
         words = Lm.Tokenization(dataset)
         Lm.generate3Grams(words)
         nxtwords = Lm.PredictNext(seq2)
     if len(nxtwords) != 0:
-        label3 = tkinter.Label(top, text=seq+" " + nxtwords[0])
+        label3 = tkinter.Label(top, text=seq + " " + nxtwords[0],font=('helvetica', 16),background="lightblue")
     else:
-        label3 = tkinter.Label(top, text="No expected")
+        label3 = tkinter.Label(top, text="No expected",font=('helvetica', 16),background='red')
     canvas1.create_window(200, 230, window=label3)
 
-button2 = tkinter.Button(text='submit', command=getNextword)
-canvas1.create_window(200, 180, window=button2)
+
+button1 = tkinter.Button(text='submit', command=getNextword,height=1,background="lightblue",font=('helvetica', 12))
+button1.configure(width = 10, activebackground = "#33B5E5", relief = FLAT)
+canvas1.create_window(200, 100, window=button1)
 canvas1.create_window(200, 60, window=entry1)
 top.mainloop()
 # if __name__ == '__main__':
