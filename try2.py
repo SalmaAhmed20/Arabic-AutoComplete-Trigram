@@ -69,11 +69,6 @@ class LanguageModel:
         predicted.sort(key=lambda x: x[1], reverse=True)
         if (len(predicted) == 0):
             return []
-        # if len(predicted) < 5:
-        #     nPred = len(predicted)
-        # for i in range(0, nPred):
-        #     outputSequence = predicted[i][0].split(" ")
-            # print(outputSequence[len(inputSequence)])
         else:
             options.append(outputSequence[len(inputSequence)])
         return options
