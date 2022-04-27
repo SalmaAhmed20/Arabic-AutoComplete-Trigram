@@ -13,7 +13,6 @@ class LanguageModel:
         # يعرض فيها الباحثون :عدد مرات انها جت بالشكل ده
         # فيها الباحثون ثمرات :عدد مرات انها جت بالشكل ده
         self.TrigramsDic = {}  # key :value
-        self.probabilitiesDic = {}
 
     def ReadData(self, dir):
         datasetTxt = ""
@@ -32,7 +31,6 @@ class LanguageModel:
         return tokens
 
     def calcProb(self, sentence):
-        counter = 0
         # sentence not exist add new key to dic
         if sentence not in self.TrigramsDic.keys():
             # no.occurrence = 1
@@ -40,8 +38,6 @@ class LanguageModel:
         else:
             # increase number of occurrence
             self.TrigramsDic[sentence] += 1
-        counter += 1
-        self.probabilitiesDic[sentence] = self.TrigramsDic[sentence] / counter
 
     # make list of sentence of 3 words from tokens  and calculate probability
     def generate3Grams(self, words_list):
@@ -55,7 +51,7 @@ class LanguageModel:
         predicted = []
         inputSequence = inputsentence.split(" ")
         # search in dictionary
-        for sentence in self.probabilitiesDic.keys():
+        for sentence in self.TrigramsDic.keys():
             if inputsentence in sentence:
                 FoundedSequence = sentence.split(" ")
                 # print(FoundedSequence)
@@ -66,7 +62,7 @@ class LanguageModel:
                         break
                 if cont:
                     continue
-                predicted.append((sentence, self.probabilitiesDic[sentence]))
+                predicted.append((sentence, self.TrigramsDic[sentence]))
         predicted.sort(key=lambda x: x[1], reverse=True)
         if (len(predicted) == 0):
             return []
@@ -122,8 +118,22 @@ if __name__ == '__main__':
     # print(dataset)
     words = Lm.Tokenization(dataset)
     seq = input("Enter search words: ")
-    Lm.generate3Grams(words)
-    nxtwords = Lm.PredictNext(seq)
+    words1 = seq.split(" ")
+    # print(len(words1))
+    if len(words1) <= 2:
+        Lm = LanguageModel()
+        dataset = Lm.ReadData('Khaleej-2004/Economy')
+        words = Lm.Tokenization(dataset)
+        Lm.generate3Grams(words)
+        nxtwords = Lm.PredictNext(seq)
+        # print(nxtwords)
+    else:
+        seq2 = words1[len(words1) - 2] + " " + words1[len(words1) - 1]
+        Lm = LanguageModel()
+        dataset = Lm.ReadData('Khaleej-2004/Economy')
+        words = Lm.Tokenization(dataset)
+        Lm.generate3Grams(words)
+        nxtwords = Lm.PredictNext(seq2)
     if len(nxtwords) != 0:
         print(nxtwords)
     else:
