@@ -67,6 +67,7 @@ class LanguageModel:
         if (len(predicted) == 0):
             return []
         else:
+            FoundedSequence = predicted[0][0].split(" ")
             options.append(FoundedSequence[len(inputSequence)])
         return options
 
@@ -135,6 +136,6 @@ if __name__ == '__main__':
         Lm.generate3Grams(words)
         nxtwords = Lm.PredictNext(seq2)
     if len(nxtwords) != 0:
-        print(nxtwords)
+        print(seq+" "+nxtwords[0])
     else:
         print("No expected")
