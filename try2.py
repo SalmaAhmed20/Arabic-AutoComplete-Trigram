@@ -46,7 +46,6 @@ class LanguageModel:
             self.calcProb(sentence)
 
     def PredictNext(self, inputsentence):
-        FoundedSequence = []
         options = []
         predicted = []
         inputSequence = inputsentence.split(" ")
@@ -65,7 +64,7 @@ class LanguageModel:
         # print (predicted)
         predicted.sort(key=lambda x: x[1], reverse=True)
         # print(predicted)
-        if (len(predicted) == 0):
+        if len(predicted) == 0:
             return []
         else:
             return predicted
@@ -74,12 +73,12 @@ class LanguageModel:
 top = tkinter.Tk()
 
 top.title("Arabic Auto fill")
-canvas1 = tkinter.Canvas(top, width=400, height=300,background='#EFFFFD')
+canvas1 = tkinter.Canvas(top, width=400, height=300, background='#EFFFFD')
 canvas1.pack()
-label1 = tkinter.Label(top, text='Enter your phrase',background='#EFFFFD')
+label1 = tkinter.Label(top, text='Enter your phrase', background='#EFFFFD')
 label1.config(font=('helvetica', 16))
 canvas1.create_window(200, 25, window=label1)
-entry1 = tkinter.Entry(top, width=20,font=('Arial 14'),borderwidth=2)
+entry1 = tkinter.Entry(top, width=20, font=('Arial 14'), borderwidth=2)
 
 
 def getNextword():
@@ -101,24 +100,23 @@ def getNextword():
         Lm.generate3Grams(words)
         nxtwords = Lm.PredictNext(seq2)
     if len(nxtwords) != 0:
-        if (len(nxtwords) >2):
-            label3 = tkinter.Label(top, text= nxtwords[0][0]+"\n"+nxtwords[1][0]+"\n"+nxtwords[2][0]
-                               ,font=('helvetica', 16),background="lightblue")
-        if (len(nxtwords) ==2):
-            label3 = tkinter.Label(top, text= nxtwords[0][0]+"\n"+nxtwords[1][0]
-                               ,font=('helvetica', 16),background="lightblue")
-        if(len(nxtwords)==1):
-            label3 = tkinter.Label(top, text= nxtwords[0][0]
+        if len(nxtwords) > 2:
+            label3 = tkinter.Label(top, text=nxtwords[0][0] + "\n" + nxtwords[1][0] + "\n" + nxtwords[2][0]
+                                   , font=('helvetica', 16), background="lightblue")
+        if len(nxtwords) == 2:
+            label3 = tkinter.Label(top, text=nxtwords[0][0] + "\n" + nxtwords[1][0]
+                                   , font=('helvetica', 16), background="lightblue")
+        if len(nxtwords) == 1:
+            label3 = tkinter.Label(top, text=nxtwords[0][0]
                                    , font=('helvetica', 16), background="lightblue")
     else:
-        label3 = tkinter.Label(top, text="No expected",font=('helvetica', 16),background='red')
+        label3 = tkinter.Label(top, text="No expected", font=('helvetica', 16), background='red')
     canvas1.create_window(200, 230, window=label3)
 
 
-button1 = tkinter.Button(text='submit', command=getNextword,height=1,background="lightblue",font=('helvetica', 12))
-button1.configure(width = 10, activebackground = "#33B5E5", relief = FLAT)
+button1 = tkinter.Button(text='submit', command=getNextword, height=1, background="lightblue", font=('helvetica', 12))
+button1.configure(width=10, activebackground="#33B5E5", relief=FLAT)
 canvas1.create_window(200, 100, window=button1)
-
 canvas1.create_window(200, 60, window=entry1)
 top.mainloop()
 # if __name__ == '__main__':
