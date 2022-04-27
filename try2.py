@@ -58,7 +58,7 @@ class LanguageModel:
         for sentence in self.probabilitiesDic.keys():
             if inputsentence in sentence:
                 FoundedSequence = sentence.split(" ")
-                # print(outputSequence)
+                # print(FoundedSequence)
                 cont = False
                 for i in range(0, len(inputSequence)):
                     if FoundedSequence[i] != inputSequence[i]:
@@ -75,56 +75,56 @@ class LanguageModel:
         return options
 
 
-top = tkinter.Tk()
-
-top.title("Arabic Auto fill")
-canvas1 = tkinter.Canvas(top, width=400, height=300,background='#EFFFFD')
-canvas1.pack()
-label1 = tkinter.Label(top, text='Enter your phrase',background='#EFFFFD')
-label1.config(font=('helvetica', 16))
-canvas1.create_window(200, 25, window=label1)
-entry1 = tkinter.Entry(top, width=20,font=('Arial 14'),borderwidth=2)
-
-
-def getNextword():
-    seq = entry1.get()
-    words1 = seq.split(" ")
-    # print(len(words1))
-    if len(words1) <= 2:
-        Lm = LanguageModel()
-        dataset = Lm.ReadData('Khaleej-2004/Economy')
-        words = Lm.Tokenization(dataset)
-        Lm.generate3Grams(words)
-        nxtwords = Lm.PredictNext(seq)
-        # print(nxtwords)
-    else:
-        seq2 = words1[len(words1) - 2] + " " + words1[len(words1) - 1]
-        Lm = LanguageModel()
-        dataset = Lm.ReadData('Khaleej-2004/Economy')
-        words = Lm.Tokenization(dataset)
-        Lm.generate3Grams(words)
-        nxtwords = Lm.PredictNext(seq2)
-    if len(nxtwords) != 0:
-        label3 = tkinter.Label(top, text=seq + " " + nxtwords[0],font=('helvetica', 16),background="lightblue")
-    else:
-        label3 = tkinter.Label(top, text="No expected",font=('helvetica', 16),background='red')
-    canvas1.create_window(200, 230, window=label3)
-
-
-button1 = tkinter.Button(text='submit', command=getNextword,height=1,background="lightblue",font=('helvetica', 12))
-button1.configure(width = 10, activebackground = "#33B5E5", relief = FLAT)
-canvas1.create_window(200, 100, window=button1)
-canvas1.create_window(200, 60, window=entry1)
-top.mainloop()
-# if __name__ == '__main__':
-#     Lm = LanguageModel()
-#     dataset = Lm.ReadData('Khaleej-2004/Economy')
-#     # print(dataset)
-#     words = Lm.Tokenization(dataset)
-#     seq = input("Enter search words: ")
-#     Lm.generate3Grams(words)
-#     nxtwords = Lm.PredictionNext(seq)
-#     if len(nxtwords) != 0:
-#         print(nxtwords)
+# top = tkinter.Tk()
+#
+# top.title("Arabic Auto fill")
+# canvas1 = tkinter.Canvas(top, width=400, height=300,background='#EFFFFD')
+# canvas1.pack()
+# label1 = tkinter.Label(top, text='Enter your phrase',background='#EFFFFD')
+# label1.config(font=('helvetica', 16))
+# canvas1.create_window(200, 25, window=label1)
+# entry1 = tkinter.Entry(top, width=20,font=('Arial 14'),borderwidth=2)
+#
+#
+# def getNextword():
+#     seq = entry1.get()
+#     words1 = seq.split(" ")
+#     # print(len(words1))
+#     if len(words1) <= 2:
+#         Lm = LanguageModel()
+#         dataset = Lm.ReadData('Khaleej-2004/Economy')
+#         words = Lm.Tokenization(dataset)
+#         Lm.generate3Grams(words)
+#         nxtwords = Lm.PredictNext(seq)
+#         # print(nxtwords)
 #     else:
-#         print("No expected")
+#         seq2 = words1[len(words1) - 2] + " " + words1[len(words1) - 1]
+#         Lm = LanguageModel()
+#         dataset = Lm.ReadData('Khaleej-2004/Economy')
+#         words = Lm.Tokenization(dataset)
+#         Lm.generate3Grams(words)
+#         nxtwords = Lm.PredictNext(seq2)
+#     if len(nxtwords) != 0:
+#         label3 = tkinter.Label(top, text=seq + " " + nxtwords[0],font=('helvetica', 16),background="lightblue")
+#     else:
+#         label3 = tkinter.Label(top, text="No expected",font=('helvetica', 16),background='red')
+#     canvas1.create_window(200, 230, window=label3)
+#
+#
+# button1 = tkinter.Button(text='submit', command=getNextword,height=1,background="lightblue",font=('helvetica', 12))
+# button1.configure(width = 10, activebackground = "#33B5E5", relief = FLAT)
+# canvas1.create_window(200, 100, window=button1)
+# canvas1.create_window(200, 60, window=entry1)
+# top.mainloop()
+if __name__ == '__main__':
+    Lm = LanguageModel()
+    dataset = Lm.ReadData('Khaleej-2004/Economy')
+    # print(dataset)
+    words = Lm.Tokenization(dataset)
+    seq = input("Enter search words: ")
+    Lm.generate3Grams(words)
+    nxtwords = Lm.PredictNext(seq)
+    if len(nxtwords) != 0:
+        print(nxtwords)
+    else:
+        print("No expected")
