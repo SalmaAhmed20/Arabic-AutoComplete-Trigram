@@ -1,112 +1,154 @@
+# -*- coding: utf-8 -*-
+# 20180122 Salma Ahmed
+# 20180078 Thoraya Atef
+# 20180040 Esraa Abo Bakr
 import os
-import re
+# GUI
+import tkinter
+from tkinter import FLAT
 
 import nltk
 from nltk.corpus import stopwords
 
 
-class languageModel:
+class LanguageModel:
     def __init__(self):
-        self.trigramList = {}
-        self.probabilities = {}
+        # يعرض فيها الباحثون :عدد مرات انها جت بالشكل ده
+        # فيها الباحثون ثمرات :عدد مرات انها جت بالشكل ده
+        self.TrigramsDic = {}  # key :value
 
-    # read data from specific directory into one string
-    def ReadData(self,scraped_dir):
+    def ReadData(self, dir):
         datasetTxt = ""
-        for filename in os.listdir(scraped_dir):
-            f = os.path.join(scraped_dir, filename)
+        for filename in os.listdir(dir):
+            f = os.path.join(dir, filename)
             # checking if it is a file
             if os.path.isfile(f):
                 file = open(f, "r", encoding='utf-8')
-                datasetTxt = datasetTxt +".\n"+ file.read().strip()
+                datasetTxt = datasetTxt + ".\n" + file.read().strip()
                 file.close()
         return datasetTxt
-    # if we don't have probability to one word for given statement
-    def CalcProb(self,phrase, counter=0):
-        if phrase not in self.trigramList.keys():
-            self.trigramList[phrase] = 1
-        else:
-            self.trigramList[phrase] += 1
-        counter += 1
-        self.probabilities[phrase] = self.trigramList[phrase] / counter
-        # print(self.probabilities[phrase])
-        # print("innnn")
-        # print(self.trigramList)
 
-    def generateNGrams(self,words_list, counter=0):
-        triGrams = []
+    def Tokenization(self, text):
+        sw = stopwords.words('arabic')
+        tokens = nltk.word_tokenize(text)
+        return tokens
+
+    def calcProb(self, sentence):
+        # sentence not exist add new key to dic
+        if sentence not in self.TrigramsDic.keys():
+            # no.occurrence = 1
+            self.TrigramsDic[sentence] = 1
+        else:
+            # increase number of occurrence
+            self.TrigramsDic[sentence] += 1
+
+    # make list of sentence of 3 words from tokens  and calculate probability
+    def generate3Grams(self, words_list):
         for num in range(0, len(words_list)):
             sentence = ' '.join(words_list[num:num + 3])
-            self.CalcProb(sentence, counter)
+            self.calcProb(sentence)
 
-    def splitSequence(self,seq):
-        return seq.split(" ")
-    def getPredictions(self,sequence):
-        count = 0
-        nPredictions = 5
-        options = []
+    def PredictNext(self, inputsentence):
         predicted = []
-        nPred = nPredictions
-        inputSequence = self.splitSequence(sequence)
-        for sentence in self.probabilities.keys():
-            if sequence in sentence:
-                outputSequence = self.splitSequence(sentence)
+        inputSequence = inputsentence.split(" ")
+        # search in dictionary
+        for sentence in self.TrigramsDic.keys():
+            if inputsentence in sentence:
+                FoundedSequence = sentence.split(" ")
                 cont = False
                 for i in range(0, len(inputSequence)):
-                    if outputSequence[i] != inputSequence[i]:
+                    if FoundedSequence[i] != inputSequence[i]:
                         cont = True
                         break
                 if cont:
                     continue
-                predicted.append((sentence, self.probabilities[sentence]))
+                predicted.append((sentence, self.TrigramsDic[sentence]))
+        # print (predicted)
         predicted.sort(key=lambda x: x[1], reverse=True)
-
-        noPrediction = False
+        # print(predicted)
         if len(predicted) == 0:
-            print("No predicted words")
-            noPrediction = True
+            return []
         else:
-            if len(predicted) < nPredictions:
-                nPred = len(predicted)
+            return predicted
 
-            for i in range(0, nPred):
-                outputSequence = predicted[i][0].split(" ")
-                print(outputSequence[len(inputSequence)])
-                options.append(outputSequence[len(inputSequence)])
-        return options, noPrediction, nPred
 
-    # preparing data for generating ngrams
-    def tokenizeText(self,text):
-        text = text.lower()
-        # tokenizing text to work on arabic and english words and numbers
-        text = re.sub('[^\sa-zA-Z0-9ء-ي]', '', text)
-        return text.split()
+top = tkinter.Tk()
 
-if __name__ == '__main__':
-    # # Your directory to the folder with scraped websites
-    # scraped_dir = 'Khaleej-2004/Economy'
-    # dataset = ""
-    # x = 0
-    # for filename in os.listdir(scraped_dir):
-    #     f = os.path.join(scraped_dir, filename)
-    #     # checking if it is a file
-    #     if os.path.isfile(f):
-    #         page = open(f, "r", encoding='utf-8')
-    #         dataset = dataset + page.read().strip()
-    # sw = stopwords.words('arabic')
-    # tokens = nltk.word_tokenize(dataset)
-    # stopped_tokens = [i for i in tokens if not i in sw]
-    # print(tokens)
-    # # stopped_tokens = list(dict.fromkeys(stopped_tokens))
-    # x = x + len(stopped_tokens)
-    #
-    # print(x)
-    # for item in stopped_tokens:
-    #     print(item)
-    l=languageModel()
-    dataset = l.ReadData('Khaleej-2004/Economy')
-    words = l.tokenizeText(dataset)
+top.title("Arabic Auto fill")
+canvas1 = tkinter.Canvas(top, width=400, height=300, background='#EFFFFD')
+canvas1.pack()
+label1 = tkinter.Label(top, text='Enter your phrase', background='#EFFFFD')
+label1.config(font=('helvetica', 16))
+canvas1.create_window(200, 25, window=label1)
+entry1 = tkinter.Entry(top, width=20, font=('Arial 14'), borderwidth=2)
 
-    seq = input("Enter search words: ")
-    l.generateNGrams(words, len(seq.split()) + 1)
-    l.getPredictions(seq)
+
+def getNextword():
+    seq = entry1.get()
+    words1 = seq.split(" ")
+    # print(len(words1))
+    if len(words1) <= 2:
+        Lm = LanguageModel()
+        dataset = Lm.ReadData('Khaleej-2004/Economy')
+        words = Lm.Tokenization(dataset)
+        Lm.generate3Grams(words)
+        nxtwords = Lm.PredictNext(seq)
+        # print(nxtwords)
+    else:
+        seq2 = words1[len(words1) - 2] + " " + words1[len(words1) - 1]
+        Lm = LanguageModel()
+        dataset = Lm.ReadData('Khaleej-2004/Economy')
+        words = Lm.Tokenization(dataset)
+        Lm.generate3Grams(words)
+        nxtwords = Lm.PredictNext(seq2)
+    if len(nxtwords) != 0:
+        if len(nxtwords) > 2:
+            label3 = tkinter.Label(top, text=nxtwords[0][0] + "\n" + nxtwords[1][0] + "\n" + nxtwords[2][0]
+                                   , font=('helvetica', 16), background="lightblue")
+        if len(nxtwords) == 2:
+            label3 = tkinter.Label(top, text=nxtwords[0][0] + "\n" + nxtwords[1][0]
+                                   , font=('helvetica', 16), background="lightblue")
+        if len(nxtwords) == 1:
+            label3 = tkinter.Label(top, text=nxtwords[0][0]
+                                   , font=('helvetica', 16), background="lightblue")
+    else:
+        label3 = tkinter.Label(top, text="No expected", font=('helvetica', 16), background='red')
+    canvas1.create_window(200, 230, window=label3)
+
+
+button1 = tkinter.Button(text='submit', command=getNextword, height=1, background="lightblue", font=('helvetica', 12))
+button1.configure(width=10, activebackground="#33B5E5", relief=FLAT)
+canvas1.create_window(200, 100, window=button1)
+canvas1.create_window(200, 60, window=entry1)
+top.mainloop()
+# if __name__ == '__main__':
+#     Lm = LanguageModel()
+#     dataset = Lm.ReadData('Khaleej-2004/Economy')
+#     words = Lm.Tokenization(dataset)
+#     seq = input("Enter search words: ")
+#     words1 = seq.split(" ")
+#     if len(words1) <= 2:
+#         Lm = LanguageModel()
+#         dataset = Lm.ReadData('Khaleej-2004/Economy')
+#         words = Lm.Tokenization(dataset)
+#         Lm.generate3Grams(words)
+#         nxtwords = Lm.PredictNext(seq)
+#     else:
+#         seq2 = words1[len(words1) - 2] + " " + words1[len(words1) - 1]
+#         Lm = LanguageModel()
+#         dataset = Lm.ReadData('Khaleej-2004/Economy')
+#         words = Lm.Tokenization(dataset)
+#         Lm.generate3Grams(words)
+#         nxtwords = Lm.PredictNext(seq2)
+#     if len(nxtwords) != 0:
+#         if len(nxtwords)==1:
+#             print(nxtwords[0][0])
+#         if(len(nxtwords)==2):
+#             print(nxtwords[0][0])
+#             print(nxtwords[1][0])
+#         else:
+#             print(nxtwords[0][0])
+#             print(nxtwords[1][0])
+#             print(nxtwords[2][0])
+#     else:
+#         print("No expected")
